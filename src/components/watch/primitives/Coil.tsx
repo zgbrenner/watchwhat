@@ -4,14 +4,18 @@ type CoilProps = {
   color?: string
 }
 
-/**
- * A wound electromagnetic coil, approximated as a short squat cylinder.
- */
+/** A squat coil laid flat with z as thickness. */
 export function Coil({ radius = 0.03, height = 0.02, color = "#b8843a" }: CoilProps) {
   return (
-    <mesh>
-      <cylinderGeometry args={[radius, radius, height, 16]} />
-      <meshStandardMaterial color={color} metalness={0.4} roughness={0.6} />
-    </mesh>
+    <group>
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[radius, radius, height, 28]} />
+        <meshStandardMaterial color={color} metalness={0.45} roughness={0.52} />
+      </mesh>
+      <mesh>
+        <torusGeometry args={[radius * 0.82, radius * 0.08, 8, 40]} />
+        <meshStandardMaterial color="#d08a3a" metalness={0.55} roughness={0.38} />
+      </mesh>
+    </group>
   )
 }
