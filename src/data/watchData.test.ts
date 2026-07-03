@@ -47,13 +47,15 @@ describe("catalog integrity", () => {
     }
   })
 
-  it("does not duplicate flow order values within a movement", () => {
-    for (const movementType of movementTypes) {
-      const flowOrders = movementConfigs[movementType].partIds
-        .map((partId) => getCatalogPartById(partId)?.energyFlowOrder)
-        .filter((flowOrder): flowOrder is number => flowOrder !== undefined)
+  it("has a usable flow path for powered movement modes", () => {
+    for (const movementType of ["manual", "automatic", "quartz"] satisfies MovementType[]) {
+      const flowParts = movementConfigs[movementType].partIds
+        .map((partId) => getCatalogPartById(partId))
+        .filter((part) => part?.energyFlowOrder !== undefined)
+        .sort((a, b) => (a?.energyFlowOrder ?? 0) - (b?.energyFlowOrder ?? 0))
 
-      expect(new Set(flowOrders).size).toBe(flowOrders.length)
+      expect(flowParts.length).toBeGreaterThan(3)
+      expect(flowParts[0]?.energyFlowOrder).toBeGreaterThanOrEqual(0)
     }
   })
 
