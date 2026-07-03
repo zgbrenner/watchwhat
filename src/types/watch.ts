@@ -6,7 +6,6 @@ export type ViewerMode =
   | "teardown"
   | "energy"
   | "isolate"
-  | "quiz"
 
 export type WatchPartCategory =
   | "case"
