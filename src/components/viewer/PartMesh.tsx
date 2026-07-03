@@ -1,6 +1,6 @@
-import { useLayoutEffect, useRef, type ReactNode } from "react"
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react"
 import { useFrame, type ThreeEvent } from "@react-three/fiber"
-import type { Group } from "three"
+import type { Group, Material, Mesh } from "three"
 import { Case } from "@/components/watch/primitives/Case"
 import { Coil } from "@/components/watch/primitives/Coil"
 import { Crown } from "@/components/watch/primitives/Crown"
@@ -11,8 +11,9 @@ import { Plate } from "@/components/watch/primitives/Plate"
 import { Screw } from "@/components/watch/primitives/Screw"
 import { Spring } from "@/components/watch/primitives/Spring"
 import { Strap } from "@/components/watch/primitives/Strap"
+import { teardownSteps } from "@/data/teardownSteps"
 import { useViewerStore } from "@/store/viewerStore"
-import type { PartTransform, WatchPart } from "@/types/watch"
+import type { PartTransform, Vector3Tuple, WatchPart } from "@/types/watch"
 import { easeInOutCubic } from "@/utils/animation"
 import { lerpVector3 } from "@/utils/geometry"
 import { PartLabel } from "./PartLabel"
@@ -71,11 +72,50 @@ type PartMeshProps = {
   transform: PartTransform
 }
 
+type StoredMaterialState = {
+  watchwhatOriginalOpacity?: number
+  watchwhatOriginalTransparent?: boolean
+  watchwhatOriginalDepthWrite?: boolean
+}
+
 const EXPLODE_DURATION_SECONDS = 0.5
+const ZERO_ROTATION: Vector3Tuple = [0, 0, 0]
+
+function scaleToTuple(scale: PartTransform["scale"]): Vector3Tuple {
+  if (Array.isArray(scale)) return scale
+  const scalar = scale ?? 1
+  return [scalar, scalar, scalar]
+}
+
+function multiplyScale(scale: Vector3Tuple, multiplier: number): Vector3Tuple {
+  return [scale[0] * multiplier, scale[1] * multiplier, scale[2] * multiplier]
+}
+
+function applyOpacity(material: Material, opacityMultiplier: number) {
+  const userData = material.userData as StoredMaterialState
+  userData.watchwhatOriginalOpacity ??= material.opacity
+  userData.watchwhatOriginalTransparent ??= material.transparent
+  userData.watchwhatOriginalDepthWrite ??= material.depthWrite
+
+  material.opacity = userData.watchwhatOriginalOpacity * opacityMultiplier
+  material.transparent = userData.watchwhatOriginalTransparent || opacityMultiplier < 0.99
+  material.depthWrite = Boolean(userData.watchwhatOriginalDepthWrite) && opacityMultiplier > 0.6
+  material.needsUpdate = true
+}
+
+function applyGroupOpacity(group: Group, opacityMultiplier: number) {
+  group.traverse((child) => {
+    const mesh = child as Mesh
+    if (!mesh.material) return
+    const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+    materials.forEach((material) => applyOpacity(material, opacityMultiplier))
+  })
+}
 
 export function PartMesh({ part, transform }: PartMeshProps) {
   const groupRef = useRef<Group>(null)
 
+  const movementType = useViewerStore((state) => state.movementType)
   const viewerMode = useViewerStore((state) => state.viewerMode)
   const teardownStep = useViewerStore((state) => state.teardownStep)
   const selectedPartId = useViewerStore((state) => state.selectedPartId)
@@ -85,16 +125,25 @@ export function PartMesh({ part, transform }: PartMeshProps) {
   const selectPart = useViewerStore((state) => state.selectPart)
   const hoverPart = useViewerStore((state) => state.hoverPart)
 
+  const currentTeardownStep = teardownSteps[movementType][teardownStep]
+  const activeTeardownStepNumber = currentTeardownStep?.step ?? -1
   const isSelected = selectedPartId === part.id
   const isHovered = hoveredPartId === part.id
-  const isIsolateMode = viewerMode === "isolate"
-  const isVisible = !isIsolateMode || !isolatedPartId || isolatedPartId === part.id
+  const isCurrentTeardownPart = viewerMode === "teardown" && currentTeardownStep?.partId === part.id
+  const isFutureTeardownPart = viewerMode === "teardown" && part.disassemblyStep > activeTeardownStepNumber
+  const isIsolatedAway = viewerMode === "isolate" && Boolean(isolatedPartId) && isolatedPartId !== part.id
+  const isDimmedEnergyPart = viewerMode === "energy" && part.energyFlowOrder === undefined
 
   const shouldExplode =
     viewerMode === "exploded" ||
     viewerMode === "energy" ||
     viewerMode === "quiz" ||
-    (viewerMode === "teardown" && part.disassemblyStep <= teardownStep)
+    (viewerMode === "teardown" && part.disassemblyStep <= activeTeardownStepNumber)
+
+  const opacityMultiplier = isIsolatedAway ? 0.12 : isFutureTeardownPart ? 0.16 : isDimmedEnergyPart ? 0.18 : 1
+  const emphasis = isSelected ? 1.16 : isHovered ? 1.08 : isCurrentTeardownPart ? 1.12 : 1
+  const baseScale = scaleToTuple(transform.scale)
+  const visualScale = multiplyScale(baseScale, emphasis)
 
   // Tracks animation progress between assembled (0) and exploded (1) purely
   // imperatively — read and written only inside useFrame/effects, never
@@ -108,9 +157,16 @@ export function PartMesh({ part, transform }: PartMeshProps) {
   useLayoutEffect(() => {
     if (!groupRef.current) return
     const [x, y, z] = explodedness.current === 1 ? transform.explodedPosition : transform.assembledPosition
+    const rotation = explodedness.current === 1 ? transform.explodedRotation : transform.assembledRotation
     groupRef.current.position.set(x, y, z)
+    groupRef.current.rotation.set(...(rotation ?? ZERO_ROTATION))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (!groupRef.current) return
+    applyGroupOpacity(groupRef.current, opacityMultiplier)
+  }, [opacityMultiplier])
 
   useFrame((_, delta) => {
     const target = shouldExplode ? 1 : 0
@@ -127,17 +183,25 @@ export function PartMesh({ part, transform }: PartMeshProps) {
         transform.explodedPosition,
         easeInOutCubic(next),
       )
+      const [rx, ry, rz] = lerpVector3(
+        transform.assembledRotation ?? ZERO_ROTATION,
+        transform.explodedRotation ?? transform.assembledRotation ?? ZERO_ROTATION,
+        easeInOutCubic(next),
+      )
       groupRef.current.position.set(x, y, z)
+      groupRef.current.rotation.set(rx, ry, rz)
     }
   })
 
   const handlePointerOver = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation()
+    document.body.style.cursor = "pointer"
     hoverPart(part.id)
   }
 
   const handlePointerOut = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation()
+    document.body.style.cursor = "auto"
     if (hoveredPartId === part.id) hoverPart(null)
   }
 
@@ -146,8 +210,6 @@ export function PartMesh({ part, transform }: PartMeshProps) {
     selectPart(part.id)
   }
 
-  if (!isVisible) return null
-
   return (
     <group
       ref={groupRef}
@@ -155,8 +217,10 @@ export function PartMesh({ part, transform }: PartMeshProps) {
       onPointerOut={handlePointerOut}
       onClick={handleClick}
     >
-      <group scale={isSelected ? 1.15 : isHovered ? 1.05 : 1}>{renderPrimitive(part)}</group>
-      {showLabels && (isSelected || isHovered) && <PartLabel label={part.label} highlighted={isSelected} />}
+      <group scale={visualScale}>{renderPrimitive(part)}</group>
+      {showLabels && (isSelected || isHovered || isCurrentTeardownPart) && (
+        <PartLabel label={part.label} highlighted={isSelected || isCurrentTeardownPart} />
+      )}
     </group>
   )
 }
