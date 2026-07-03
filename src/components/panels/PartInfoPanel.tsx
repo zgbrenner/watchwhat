@@ -1,4 +1,4 @@
-import { AlertTriangle, HelpCircle, Link2, Route } from "lucide-react"
+import { AlertTriangle, Link2, Route } from "lucide-react"
 import { useViewerStore } from "@/store/viewerStore"
 import { getConnectedParts, getPartById } from "@/utils/partLookup"
 
@@ -95,16 +95,6 @@ export function PartInfoPanel() {
             Failure Mode
           </h3>
           <p className="mt-1 text-sm text-amber-100">{part.failureMode}</p>
-        </section>
-      )}
-
-      {part.quizPrompt && (
-        <section className="rounded-lg border border-bench-700 bg-bench-900 p-3">
-          <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-bench-400">
-            <HelpCircle size={14} aria-hidden="true" />
-            Quiz
-          </h3>
-          <p className="mt-1 text-sm text-bench-100">{part.quizPrompt}</p>
         </section>
       )}
     </div>

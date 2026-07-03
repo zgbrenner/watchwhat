@@ -14,7 +14,7 @@ and `docs/THIRD_PARTY_ASSETS.md` for important notes on 3D asset licensing.
 This is v0.1 — an early interactive teaching atlas. The app now includes the
 core viewer shell, procedural watch parts, movement switching, exploded view,
 teardown mode, energy-flow mode, isolate mode, searchable educational part
-copy, and an initial quiz mode.
+copy, and clickable part explanations.
 
 The geometry is intentionally simplified. Visual fidelity and content depth
 will grow in future iterations. See `docs/PRODUCT_SPEC.md` for the full product
@@ -29,7 +29,6 @@ vision and `docs/RESEARCH_AND_ASSET_PLAN.md` for the long-term asset plan.
 - Energy-flow / assembly-map overlay
 - Clickable part labels and educational info panels
 - Part search
-- Quiz Mode: click the correct part in the 3D viewer based on a prompt
 
 ## Getting started
 
