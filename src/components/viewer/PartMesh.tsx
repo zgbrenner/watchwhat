@@ -19,41 +19,207 @@ import { easeInOutCubic } from "@/utils/animation"
 import { lerpVector3 } from "@/utils/geometry"
 import { PartLabel } from "./PartLabel"
 
+function DialPrimitive() {
+  return (
+    <group>
+      <Plate radius={0.38} thickness={0.012} color="#f4ead2" />
+      {Array.from({ length: 12 }, (_, index) => {
+        const angle = (index / 12) * Math.PI * 2
+        const x = Math.sin(angle) * 0.31
+        const y = Math.cos(angle) * 0.31
+        return (
+          <mesh key={index} position={[x, y, 0.01]} rotation={[0, 0, -angle]}>
+            <boxGeometry args={[0.012, index % 3 === 0 ? 0.056 : 0.034, 0.004]} />
+            <meshStandardMaterial color="#20242a" metalness={0.28} roughness={0.38} />
+          </mesh>
+        )
+      })}
+      <mesh position={[0, 0, 0.012]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.018, 0.018, 0.005, 32]} />
+        <meshStandardMaterial color="#20242a" metalness={0.45} roughness={0.32} />
+      </mesh>
+    </group>
+  )
+}
+
+function MainPlatePrimitive() {
+  return (
+    <group>
+      <Plate radius={0.41} thickness={0.028} color="#d8bf77" />
+      <mesh position={[0.26, 0.18, 0.018]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.13, 0.13, 0.006, 48]} />
+        <meshStandardMaterial color="#1d2228" metalness={0.2} roughness={0.6} />
+      </mesh>
+      <mesh position={[-0.22, 0.18, 0.019]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.09, 0.09, 0.006, 40]} />
+        <meshStandardMaterial color="#b99d57" metalness={0.42} roughness={0.36} />
+      </mesh>
+      {[[-0.27, -0.2], [0.28, -0.18], [-0.08, 0.28]].map(([x, y]) => (
+        <mesh key={`${x}-${y}`} position={[x, y, 0.023]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.018, 0.018, 0.005, 24]} />
+          <meshStandardMaterial color="#a51e2d" metalness={0.1} roughness={0.08} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+function BridgePrimitive() {
+  return (
+    <group>
+      <mesh>
+        <boxGeometry args={[0.46, 0.16, 0.022]} />
+        <meshStandardMaterial color="#c8a460" metalness={0.62} roughness={0.26} />
+      </mesh>
+      <mesh position={[-0.2, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.08, 0.08, 0.024, 32]} />
+        <meshStandardMaterial color="#c8a460" metalness={0.62} roughness={0.26} />
+      </mesh>
+      <mesh position={[0.22, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.08, 0.08, 0.024, 32]} />
+        <meshStandardMaterial color="#c8a460" metalness={0.62} roughness={0.26} />
+      </mesh>
+      {[-0.18, 0.02, 0.2].map((x) => (
+        <Jewel key={x} radius={0.014} color="#b3122d" />
+      ))}
+    </group>
+  )
+}
+
+function BalanceWheelPrimitive() {
+  return (
+    <group>
+      <mesh>
+        <torusGeometry args={[0.075, 0.006, 8, 64]} />
+        <meshStandardMaterial color="#d7dce0" metalness={0.85} roughness={0.2} />
+      </mesh>
+      <mesh>
+        <boxGeometry args={[0.15, 0.008, 0.005]} />
+        <meshStandardMaterial color="#d7dce0" metalness={0.85} roughness={0.2} />
+      </mesh>
+      <mesh rotation={[0, 0, Math.PI / 2]}>
+        <boxGeometry args={[0.15, 0.008, 0.005]} />
+        <meshStandardMaterial color="#d7dce0" metalness={0.85} roughness={0.2} />
+      </mesh>
+      <Jewel radius={0.014} color="#b3122d" />
+    </group>
+  )
+}
+
+function PalletForkPrimitive() {
+  return (
+    <group>
+      <mesh>
+        <boxGeometry args={[0.11, 0.018, 0.006]} />
+        <meshStandardMaterial color="#aeb7c0" metalness={0.8} roughness={0.25} />
+      </mesh>
+      <mesh position={[0.055, 0.025, 0]} rotation={[0, 0, 0.62]}>
+        <boxGeometry args={[0.07, 0.014, 0.006]} />
+        <meshStandardMaterial color="#aeb7c0" metalness={0.8} roughness={0.25} />
+      </mesh>
+      <mesh position={[0.055, -0.025, 0]} rotation={[0, 0, -0.62]}>
+        <boxGeometry args={[0.07, 0.014, 0.006]} />
+        <meshStandardMaterial color="#aeb7c0" metalness={0.8} roughness={0.25} />
+      </mesh>
+      <Jewel radius={0.009} color="#b3122d" />
+    </group>
+  )
+}
+
+function KeylessWorksPrimitive() {
+  return (
+    <group>
+      <mesh rotation={[0, 0, -0.25]}>
+        <boxGeometry args={[0.16, 0.018, 0.006]} />
+        <meshStandardMaterial color="#c9a85d" metalness={0.7} roughness={0.28} />
+      </mesh>
+      <mesh position={[0.055, 0.035, 0]} rotation={[0, 0, 0.85]}>
+        <boxGeometry args={[0.11, 0.014, 0.006]} />
+        <meshStandardMaterial color="#b9c1c9" metalness={0.82} roughness={0.22} />
+      </mesh>
+      <Gear radius={0.026} thickness={0.006} teeth={12} color="#d6b46b" />
+    </group>
+  )
+}
+
+function BatteryPrimitive() {
+  return (
+    <group>
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.085, 0.085, 0.022, 48]} />
+        <meshStandardMaterial color="#d8dee4" metalness={0.92} roughness={0.18} />
+      </mesh>
+      <mesh position={[0, 0, 0.013]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.055, 0.055, 0.003, 40]} />
+        <meshStandardMaterial color="#a9b2ba" metalness={0.9} roughness={0.22} />
+      </mesh>
+    </group>
+  )
+}
+
+function CircuitPrimitive() {
+  return (
+    <group>
+      <mesh>
+        <boxGeometry args={[0.18, 0.12, 0.008]} />
+        <meshStandardMaterial color="#234c3a" metalness={0.18} roughness={0.62} />
+      </mesh>
+      {[[-0.05, 0.02], [0.02, -0.025], [0.06, 0.03]].map(([x, y]) => (
+        <mesh key={`${x}-${y}`} position={[x, y, 0.007]}>
+          <boxGeometry args={[0.035, 0.02, 0.005]} />
+          <meshStandardMaterial color="#101820" metalness={0.25} roughness={0.5} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
 const PART_ID_OVERRIDES: Record<string, (part: WatchPart) => ReactNode> = {
-  "case-back": () => <Case radius={0.45} height={0.03} color="#707c87" />,
+  "case-back": () => <Case radius={0.45} height={0.035} color="#707c87" />,
   "case-middle": () => <Case radius={0.45} height={0.14} color="#9ba5ad" openEnded />,
-  "case-crystal": () => <Case radius={0.42} height={0.015} color="#d6e4ea" />,
-  "case-bezel": () => <Case radius={0.46} height={0.02} color="#c4cad0" openEnded />,
-  "dial-face": () => <Plate radius={0.38} thickness={0.01} color="#f3e9cf" />,
-  mainplate: () => <Plate radius={0.4} thickness={0.02} color="#e6d1a1" />,
-  "bridge-train": () => <Plate radius={0.22} thickness={0.015} color="#d6b46b" />,
+  "case-crystal": () => <Case radius={0.4} height={0.012} color="#d6e4ea" opacity={0.32} />,
+  "case-bezel": () => <Case radius={0.46} height={0.025} color="#c4cad0" openEnded />,
+  "dial-face": () => <DialPrimitive />,
+  mainplate: () => <MainPlatePrimitive />,
+  "bridge-train": () => <BridgePrimitive />,
   "rotor-automatic": () => <Rotor />,
   "rotor-bearing": () => <Jewel radius={0.028} color="#d7dce0" />,
-  "automatic-bridge": () => <Plate radius={0.3} thickness={0.012} color="#c9a85d" />,
-  "reverser-wheel": () => <Gear radius={0.055} thickness={0.018} teeth={16} color="#d6b46b" />,
-  "winding-wheel": () => <Gear radius={0.045} thickness={0.016} teeth={14} color="#c99b49" />,
-  "reduction-wheel": () => <Gear radius={0.04} thickness={0.014} teeth={12} color="#b8843a" />,
-  "jewel-bearing": () => <Jewel />,
+  "automatic-bridge": () => <BridgePrimitive />,
+  "reverser-wheel": () => <Gear radius={0.055} thickness={0.018} teeth={18} color="#d6b46b" />,
+  "winding-wheel": () => <Gear radius={0.046} thickness={0.016} teeth={16} color="#c99b49" />,
+  "reduction-wheel": () => <Gear radius={0.038} thickness={0.014} teeth={14} color="#b8843a" />,
+  "jewel-bearing": () => <Jewel radius={0.018} />,
   "screw-movement": () => <Screw />,
   "strap-lug": () => <Strap />,
-  "crown-stem": () => <Crown />,
-  mainspring: () => <Spring radius={0.09} tubeRadius={0.006} />,
-  "barrel-mainspring": () => <Gear radius={0.11} thickness={0.03} teeth={0} color="#b8843a" />,
-  "spring-hairspring": () => <Spring radius={0.03} tubeRadius={0.0015} color="#c4cad0" />,
-  "battery-cell": () => <Coil radius={0.045} height={0.03} color="#c4cad0" />,
-  "clip-battery": () => <Coil radius={0.02} height={0.008} color="#9ba5ad" />,
-  "circuit-ic": () => <Plate radius={0.06} thickness={0.005} color="#2f6f4f" />,
-  "crystal-quartz": () => <Jewel radius={0.012} color="#7dd3fc" />,
-  "coil-stepper": () => <Coil radius={0.025} height={0.03} />,
+  "crown-stem": () => <Crown radius={0.026} length={0.08} />,
+  mainspring: () => <Spring radius={0.082} tubeRadius={0.006} />,
+  "barrel-mainspring": () => <Gear radius={0.1} thickness={0.026} teeth={32} color="#b8843a" />,
+  "crown-wheel": () => <Gear radius={0.045} thickness={0.012} teeth={18} color="#c99b49" />,
+  "ratchet-wheel": () => <Gear radius={0.058} thickness={0.014} teeth={20} color="#d1a955" />,
+  "keyless-works": () => <KeylessWorksPrimitive />,
+  "wheel-center": () => <Gear radius={0.072} thickness={0.014} teeth={36} color="#d7b65f" />,
+  "wheel-third": () => <Gear radius={0.055} thickness={0.012} teeth={30} color="#d3ad57" />,
+  "wheel-fourth": () => <Gear radius={0.047} thickness={0.01} teeth={26} color="#cca44f" />,
+  "wheel-escape": () => <Gear radius={0.038} thickness={0.008} teeth={15} color="#e0bd66" />,
+  "pallet-fork": () => <PalletForkPrimitive />,
+  "wheel-balance": () => <BalanceWheelPrimitive />,
+  "spring-hairspring": () => <Spring radius={0.052} tubeRadius={0.0022} color="#c4cad0" />,
+  "battery-cell": () => <BatteryPrimitive />,
+  "clip-battery": () => <mesh><boxGeometry args={[0.15, 0.035, 0.006]} /><meshStandardMaterial color="#aeb7c0" metalness={0.82} roughness={0.25} /></mesh>,
+  "circuit-ic": () => <CircuitPrimitive />,
+  "crystal-quartz": () => <mesh><boxGeometry args={[0.12, 0.028, 0.018]} /><meshStandardMaterial color="#c8d0d7" metalness={0.86} roughness={0.18} /></mesh>,
+  "coil-stepper": () => <Coil radius={0.036} height={0.014} />,
+  "stepper-motor": () => <Gear radius={0.034} thickness={0.012} teeth={10} color="#aeb7c0" />,
 }
 
 function DefaultHand({ part }: { part: WatchPart }) {
-  const lengths: Record<string, number> = {
-    "hand-hour": 0.16,
-    "hand-minute": 0.24,
-    "hand-second": 0.26,
+  const props: Record<string, { length: number; width: number; angle: number; color?: string }> = {
+    "hand-hour": { length: 0.15, width: 0.02, angle: -0.72 },
+    "hand-minute": { length: 0.24, width: 0.014, angle: 0.52 },
+    "hand-second": { length: 0.28, width: 0.006, angle: 1.9, color: "#b1182d" },
   }
-  return <Hand length={lengths[part.id] ?? 0.2} />
+  const handProps = props[part.id] ?? { length: 0.2, width: 0.012, angle: 0 }
+  return <Hand {...handProps} />
 }
 
 const CATEGORY_FALLBACKS: Record<WatchPart["category"], (part: WatchPart) => ReactNode> = {
@@ -152,15 +318,8 @@ export function PartMesh({ part, transform }: PartMeshProps) {
   const baseScale = scaleToTuple(transform.scale)
   const visualScale = multiplyScale(baseScale, emphasis)
 
-  // Tracks animation progress between assembled (0) and exploded (1) purely
-  // imperatively — read and written only inside useFrame/effects, never
-  // during render, so it can't desync from React's render cycle.
   const explodedness = useRef(shouldExplode ? 1 : 0)
 
-  // Seed the mesh's starting position exactly once. Every subsequent
-  // update flows through useFrame below — position must never be a
-  // reactive JSX prop, or unrelated re-renders (hover, selection, teardown
-  // step...) would snap it back to whatever value was passed that render.
   useLayoutEffect(() => {
     if (!groupRef.current) return
     const [x, y, z] = explodedness.current === 1 ? transform.explodedPosition : transform.assembledPosition
