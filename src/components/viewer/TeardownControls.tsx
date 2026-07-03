@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react"
-import { getPartById } from "@/data/watchParts"
 import { teardownSteps } from "@/data/teardownSteps"
 import { useViewerStore } from "@/store/viewerStore"
+import { getPartById } from "@/utils/partLookup"
 
 export function TeardownControls() {
   const viewerMode = useViewerStore((state) => state.viewerMode)
