@@ -18,6 +18,7 @@ export type ViewerState = {
   hoverPart: (partId: string | null) => void
   nextTeardownStep: () => void
   previousTeardownStep: () => void
+  setTeardownStep: (stepIndex: number) => void
   setShowLabels: (showLabels: boolean) => void
   setSearchQuery: (searchQuery: string) => void
   resetViewState: () => void
@@ -38,6 +39,10 @@ function lastTeardownStepIndex(movementType: MovementType): number {
   return Math.max(0, teardownSteps[movementType].length - 1)
 }
 
+function clampTeardownStep(movementType: MovementType, stepIndex: number): number {
+  return Math.min(lastTeardownStepIndex(movementType), Math.max(0, stepIndex))
+}
+
 export const useViewerStore = create<ViewerState>((set, get) => ({
   ...initialState,
 
@@ -50,7 +55,11 @@ export const useViewerStore = create<ViewerState>((set, get) => ({
       teardownStep: 0,
     }),
 
-  setViewerMode: (viewerMode) => set({ viewerMode }),
+  setViewerMode: (viewerMode) =>
+    set((state) => ({
+      viewerMode,
+      isolatedPartId: viewerMode === "isolate" ? state.selectedPartId : null,
+    })),
 
   selectPart: (partId) =>
     set((state) => ({
@@ -62,13 +71,17 @@ export const useViewerStore = create<ViewerState>((set, get) => ({
 
   nextTeardownStep: () => {
     const { movementType, teardownStep } = get()
-    const maxIndex = lastTeardownStepIndex(movementType)
-    set({ teardownStep: Math.min(maxIndex, teardownStep + 1) })
+    set({ teardownStep: clampTeardownStep(movementType, teardownStep + 1) })
   },
 
   previousTeardownStep: () => {
-    const { teardownStep } = get()
-    set({ teardownStep: Math.max(0, teardownStep - 1) })
+    const { movementType, teardownStep } = get()
+    set({ teardownStep: clampTeardownStep(movementType, teardownStep - 1) })
+  },
+
+  setTeardownStep: (stepIndex) => {
+    const { movementType } = get()
+    set({ teardownStep: clampTeardownStep(movementType, stepIndex) })
   },
 
   setShowLabels: (showLabels) => set({ showLabels }),

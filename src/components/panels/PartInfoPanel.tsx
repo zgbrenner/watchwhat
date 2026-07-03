@@ -1,4 +1,4 @@
-import { AlertTriangle, HelpCircle, Link2 } from "lucide-react"
+import { AlertTriangle, HelpCircle, Link2, Route } from "lucide-react"
 import { getPartById } from "@/data/watchParts"
 import { useViewerStore } from "@/store/viewerStore"
 import { getConnectedParts } from "@/utils/partLookup"
@@ -10,8 +10,11 @@ export function PartInfoPanel() {
 
   if (!part) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center text-sm text-bench-400">
-        <p>Select a part in the viewer to learn what it is, what it does, and how it works.</p>
+      <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center text-sm text-bench-400">
+        <div className="rounded-full border border-bench-700 bg-bench-900 px-3 py-1 text-[10px] uppercase tracking-wide text-bench-300">
+          WatchWhat Bench
+        </div>
+        <p>Click a part of the watch to learn what it is, what it does, and how it fits into the whole mechanism.</p>
       </div>
     )
   }
@@ -26,6 +29,19 @@ export function PartInfoPanel() {
         </span>
         <h2 className="text-lg font-semibold text-bench-50">{part.label}</h2>
         <p className="mt-1 text-sm text-bench-300">{part.shortDefinition}</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 text-xs">
+        <div className="rounded-lg border border-bench-700 bg-bench-900 p-2">
+          <span className="block text-[10px] uppercase tracking-wide text-bench-500">Teardown</span>
+          <span className="text-bench-100">Step {part.disassemblyStep}</span>
+        </div>
+        <div className="rounded-lg border border-bench-700 bg-bench-900 p-2">
+          <span className="block text-[10px] uppercase tracking-wide text-bench-500">Flow</span>
+          <span className="text-bench-100">
+            {part.energyFlowOrder === undefined ? "Not in path" : `Order ${part.energyFlowOrder + 1}`}
+          </span>
+        </div>
       </div>
 
       <section>
@@ -58,6 +74,18 @@ export function PartInfoPanel() {
               </button>
             ))}
           </div>
+        </section>
+      )}
+
+      {part.energyFlowOrder !== undefined && (
+        <section className="rounded-lg border border-brass-700/50 bg-brass-950/20 p-3">
+          <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-brass-300">
+            <Route size={14} aria-hidden="true" />
+            System Role
+          </h3>
+          <p className="mt-1 text-sm text-bench-100">
+            This part appears in the ordered power or timing path. Switch to Energy Flow to see where it sits in the sequence.
+          </p>
         </section>
       )}
 
