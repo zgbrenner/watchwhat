@@ -28,12 +28,28 @@ educational MVP, not dimensional accuracy.
   - `exploded` — every part spread apart for inspection.
   - `teardown` — a guided, step-by-step disassembly sequence.
   - `energy` — a legend highlighting how power flows from the source
-    (mainspring or battery) out to the hands.
-  - `isolate` — hide everything except the selected part.
-  - `quiz` — test recall of a part's name or function.
+    (mainspring or battery) out to the hands. In exterior mode, this becomes
+    an assembly relationship map.
+  - `isolate` — fade everything except the selected part.
+  - `quiz` — test recall by clicking the correct part in the 3D viewer.
 - **Click any part** to open its info panel: short definition, function, how
   it works, what it connects to, and (where relevant) a common failure mode.
 - **Search for a part** by name from the left panel.
+
+## Quiz Mode
+
+Quiz Mode turns the viewer into an active learning tool. The app generates
+movement-scoped questions from the part catalog, asks the user to find a part,
+and checks the next part clicked in the 3D scene.
+
+Initial quiz question types:
+
+- **Identify** — click a named part or a part described by a custom prompt.
+- **Function** — click the part that performs a described role.
+- **Connection** — find a part based on what it connects to.
+
+Quiz Mode is deliberately local-only. There are no accounts, analytics,
+leaderboards, or backend services.
 
 ## Architecture
 
@@ -45,11 +61,14 @@ educational MVP, not dimensional accuracy.
   single source of truth the 3D scene and the surrounding panels both read.
 - **Tailwind CSS** for styling, **lucide-react** for icons.
 - **A clean `partId` mapping** (`src/data/watchParts.ts`,
-  `src/data/movementConfigs.ts`) decouples *what a part is and means* from
-  *how it's currently drawn*. Every part is procedural geometry today
-  (`src/components/watch/primitives/`); a real GLB/CAD asset can replace any
-  primitive later without touching the data, state, or panel code, as long
-  as it's addressed by the same `partId`.
+  `src/data/partCatalog.ts`, `src/data/movementConfigs.ts`) decouples *what a
+  part is and means* from *how it's currently drawn*. Every part is procedural
+  geometry today (`src/components/watch/primitives/`); a real GLB/CAD asset can
+  replace any primitive later without touching the data, state, or panel code,
+  as long as it's addressed by the same `partId`.
+- **Quiz utilities** (`src/utils/quiz.ts`) derive learning prompts from the same
+  part catalog used by the viewer, so educational content and quiz content stay
+  aligned.
 
 ## v0.1 scope
 
