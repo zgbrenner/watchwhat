@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react"
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { beforeEach, describe, expect, it } from "vitest"
 import { useViewerStore } from "@/store/viewerStore"
 import { getQuizQuestion } from "@/utils/quiz"
@@ -18,15 +18,20 @@ describe("QuizPanel", () => {
     expect(screen.getByText(/waiting for your click/i)).toBeInTheDocument()
   })
 
-  it("marks a clicked target part correct", () => {
+  it("marks a clicked target part correct", async () => {
     const question = getQuizQuestion("manual", 0)
     expect(question).toBeDefined()
     if (!question) return
 
     render(<QuizPanel />)
-    useViewerStore.getState().selectPart(question.targetPartId)
 
-    expect(screen.getByText(/correct/i)).toBeInTheDocument()
+    act(() => {
+      useViewerStore.getState().selectPart(question.targetPartId)
+    })
+
+    await waitFor(() => {
+      expect(screen.getByText(/correct/i)).toBeInTheDocument()
+    })
   })
 
   it("advances to the next question", () => {
