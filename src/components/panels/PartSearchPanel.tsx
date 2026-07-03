@@ -13,10 +13,10 @@ export function PartSearchPanel() {
 
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor="part-search" className="text-xs font-semibold uppercase tracking-wide text-bench-300">
+      <label htmlFor="part-search" className="text-[11px] font-semibold uppercase tracking-[0.14em] text-bench-400">
         Find a Part
       </label>
-      <div className="flex items-center gap-2 rounded-lg border border-bench-700 bg-bench-900 px-3 py-2">
+      <div className="flex items-center gap-2 rounded-xl border border-bench-800 bg-bench-900/60 px-3 py-2 transition focus-within:border-brass-400/60 focus-within:bg-bench-900">
         <Search size={16} className="text-bench-400" aria-hidden="true" />
         <input
           id="part-search"

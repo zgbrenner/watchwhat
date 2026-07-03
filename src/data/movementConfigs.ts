@@ -15,206 +15,231 @@ type LayoutEntry = {
  * as if their height axis were z while Three.js cylinders default to y; the
  * primitives now match this table.
  */
+/*
+ * Assembled z (thickness) is deliberately compressed so the watch nests into
+ * a believable case: caseback at the bottom, the movement stacked just above
+ * it, an opaque dial capping the movement, hands riding proud of the dial, and
+ * the bezel + glass crystal on top. The opaque dial hides the movement when
+ * assembled (as a real watch does) and reveals it as parts spread out in the
+ * exploded and teardown views, whose positions are tuned independently.
+ */
 const PART_LAYOUT: Record<string, LayoutEntry> = {
   "case-back": {
-    position: [0, 0, -0.34],
+    position: [0, 0, -0.075],
     explodedPosition: [0, 0, -1.0],
     scale: 1.08,
   },
   "rotor-automatic": {
-    position: [0, 0, -0.28],
+    position: [0, 0, -0.065],
     explodedPosition: [0, 0, -0.82],
     rotation: [0, 0, -0.35],
     explodedRotation: [0, 0, -1.1],
     scale: 1.08,
   },
   "rotor-bearing": {
-    position: [0, 0, -0.255],
+    position: [0, 0, -0.06],
     explodedPosition: [0.2, -0.12, -0.74],
     scale: 0.85,
   },
   "automatic-bridge": {
-    position: [0, -0.05, -0.235],
+    position: [0, -0.05, -0.062],
     explodedPosition: [-0.22, -0.18, -0.68],
     scale: [1.05, 0.64, 1],
   },
   "reverser-wheel": {
-    position: [-0.2, -0.17, -0.215],
+    position: [-0.2, -0.17, -0.06],
     explodedPosition: [-0.48, -0.38, -0.58],
     scale: 0.95,
   },
   "winding-wheel": {
-    position: [-0.02, -0.2, -0.21],
+    position: [-0.02, -0.2, -0.06],
     explodedPosition: [-0.04, -0.5, -0.55],
     scale: 0.85,
   },
   "reduction-wheel": {
-    position: [0.15, -0.16, -0.205],
+    position: [0.15, -0.16, -0.06],
     explodedPosition: [0.38, -0.42, -0.52],
     scale: 0.78,
   },
 
   "case-middle": {
-    position: [0, 0, -0.05],
+    position: [0, 0, -0.02],
     explodedPosition: [0, 0, -0.08],
     scale: 1.06,
   },
   "strap-lug": {
-    position: [0, 0, -0.08],
+    position: [0, 0, -0.03],
     explodedPosition: [0, 0, -0.18],
     scale: 1.05,
   },
   "case-bezel": {
-    position: [0, 0, 0.22],
+    position: [0, 0, 0.05],
     explodedPosition: [0, 0, 0.74],
     scale: 1.04,
   },
   "case-crystal": {
-    position: [0, 0, 0.25],
+    position: [0, 0, 0.048],
     explodedPosition: [0, 0, 0.9],
     scale: 1.02,
   },
   "dial-face": {
-    position: [0, 0, 0.12],
+    position: [0, 0, 0.0],
     explodedPosition: [0, 0, 0.58],
   },
   "hand-hour": {
-    position: [0, 0, 0.155],
+    position: [0, 0, 0.014],
     explodedPosition: [-0.12, 0.1, 0.84],
-    rotation: [0, 0, -0.72],
-    explodedRotation: [0, 0, -0.72],
+    rotation: [0, 0, 0.96],
+    explodedRotation: [0, 0, 0.96],
   },
   "hand-minute": {
-    position: [0, 0, 0.17],
+    position: [0, 0, 0.022],
     explodedPosition: [0.08, 0.18, 0.9],
-    rotation: [0, 0, 0.52],
-    explodedRotation: [0, 0, 0.52],
+    rotation: [0, 0, -1.05],
+    explodedRotation: [0, 0, -1.05],
   },
   "hand-second": {
-    position: [0, 0, 0.185],
+    position: [0, 0, 0.03],
     explodedPosition: [0.16, -0.05, 0.96],
-    rotation: [0, 0, 1.9],
-    explodedRotation: [0, 0, 1.9],
+    rotation: [0, 0, 2.5],
+    explodedRotation: [0, 0, 2.5],
   },
   "crown-stem": {
-    position: [0.55, 0, 0.02],
+    position: [0.5, 0, -0.02],
     explodedPosition: [0.86, 0, 0.12],
     rotation: [0, 0, 0],
   },
 
   mainplate: {
-    position: [0, 0, -0.08],
+    position: [0, 0, -0.05],
     explodedPosition: [0, 0, -0.36],
     scale: 1.05,
   },
   "barrel-mainspring": {
-    position: [-0.23, 0.18, -0.035],
+    position: [-0.23, 0.18, -0.05],
     explodedPosition: [-0.62, 0.44, -0.1],
     scale: 1.15,
   },
   mainspring: {
-    position: [-0.23, 0.18, -0.012],
+    position: [-0.23, 0.18, -0.045],
     explodedPosition: [-0.72, 0.52, 0.04],
     scale: 1.02,
   },
   "crown-wheel": {
-    position: [0.3, -0.06, -0.035],
+    position: [0.3, -0.06, -0.05],
     explodedPosition: [0.64, -0.2, -0.1],
     scale: 0.82,
   },
   "ratchet-wheel": {
-    position: [0.18, -0.12, -0.03],
+    position: [0.18, -0.12, -0.05],
     explodedPosition: [0.42, -0.38, -0.06],
     scale: 0.92,
   },
   "keyless-works": {
-    position: [0.36, 0.02, -0.01],
+    position: [0.36, 0.02, -0.045],
     explodedPosition: [0.78, 0.12, 0.02],
     scale: 0.95,
   },
   "wheel-center": {
-    position: [0, 0, -0.02],
+    position: [0, 0, -0.045],
     explodedPosition: [0, -0.52, 0.0],
     scale: 1.05,
   },
   "wheel-third": {
-    position: [0.13, -0.06, -0.015],
+    position: [0.13, -0.06, -0.045],
     explodedPosition: [0.42, -0.34, 0.04],
     scale: 0.92,
   },
   "wheel-fourth": {
-    position: [0.05, -0.2, -0.01],
+    position: [0.05, -0.2, -0.045],
     explodedPosition: [0.1, -0.62, 0.08],
     scale: 0.86,
   },
   "wheel-escape": {
-    position: [0.2, -0.25, 0.0],
+    position: [0.2, -0.25, -0.045],
     explodedPosition: [0.48, -0.64, 0.14],
     scale: 0.78,
   },
   "pallet-fork": {
-    position: [0.3, -0.18, 0.015],
+    position: [0.3, -0.18, -0.04],
     explodedPosition: [0.72, -0.48, 0.22],
     rotation: [0, 0, 0.25],
     scale: 0.95,
   },
   "wheel-balance": {
-    position: [0.28, 0.19, 0.012],
+    position: [0.28, 0.19, -0.04],
     explodedPosition: [0.68, 0.48, 0.18],
     scale: 1.12,
   },
   "spring-hairspring": {
-    position: [0.28, 0.19, 0.032],
+    position: [0.28, 0.19, -0.035],
     explodedPosition: [0.76, 0.54, 0.28],
     scale: 1.02,
   },
   "bridge-train": {
-    position: [0.03, -0.08, 0.035],
+    position: [0.03, -0.08, -0.03],
     explodedPosition: [0.0, -0.48, 0.34],
     rotation: [0, 0, -0.18],
     scale: [1.12, 0.62, 1],
   },
   "jewel-bearing": {
-    position: [0.12, -0.08, 0.06],
+    position: [0.12, -0.08, -0.035],
     explodedPosition: [0.34, -0.22, 0.42],
     scale: 0.9,
   },
   "screw-movement": {
-    position: [-0.12, -0.24, 0.065],
+    position: [-0.12, -0.24, -0.035],
     explodedPosition: [-0.34, -0.56, 0.42],
     scale: 1.0,
   },
 
   "battery-cell": {
-    position: [-0.24, -0.16, -0.01],
+    position: [-0.24, -0.16, -0.05],
     explodedPosition: [-0.62, -0.38, 0.14],
     scale: 1.18,
   },
   "clip-battery": {
-    position: [-0.24, -0.06, 0.02],
+    position: [-0.24, -0.06, -0.045],
     explodedPosition: [-0.58, -0.12, 0.3],
     scale: [1.1, 0.58, 1],
   },
   "circuit-ic": {
-    position: [0.04, -0.2, 0.0],
+    position: [0.04, -0.2, -0.05],
     explodedPosition: [0.08, -0.58, 0.18],
     scale: [1.28, 0.8, 1],
   },
   "crystal-quartz": {
-    position: [0.24, -0.08, 0.015],
+    position: [0.24, -0.08, -0.045],
     explodedPosition: [0.58, -0.2, 0.3],
     scale: 1.1,
   },
   "coil-stepper": {
-    position: [0.18, 0.16, 0.015],
+    position: [0.18, 0.16, -0.045],
     explodedPosition: [0.48, 0.42, 0.28],
     scale: 1.2,
   },
   "stepper-motor": {
-    position: [0.05, 0.16, 0.02],
+    position: [0.05, 0.16, -0.045],
     explodedPosition: [0.1, 0.48, 0.34],
     scale: 0.95,
   },
+}
+
+/*
+ * The authored exploded positions push parts steeply toward the camera (+z),
+ * which reads as looming overlap from a head-on view. We widen the in-plane
+ * spread and flatten the depth so the explosion fans out into readable layers
+ * when viewed at the default three-quarter angle.
+ */
+const EXPLODE_LATERAL = 1.2
+const EXPLODE_DEPTH = 0.5
+
+function remapExploded(
+  exploded: Vector3Tuple | undefined,
+  assembled: Vector3Tuple,
+): Vector3Tuple {
+  if (!exploded) return assembled
+  return [exploded[0] * EXPLODE_LATERAL, exploded[1] * EXPLODE_LATERAL, exploded[2] * EXPLODE_DEPTH]
 }
 
 function buildTransform(partId: string): PartTransform {
@@ -225,7 +250,7 @@ function buildTransform(partId: string): PartTransform {
   return {
     partId,
     assembledPosition: layout.position,
-    explodedPosition: layout.explodedPosition ?? layout.position,
+    explodedPosition: remapExploded(layout.explodedPosition, layout.position),
     assembledRotation: layout.rotation,
     explodedRotation: layout.explodedRotation ?? layout.rotation,
     scale: layout.scale,

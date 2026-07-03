@@ -11,23 +11,29 @@ and `docs/THIRD_PARTY_ASSETS.md` for important notes on 3D asset licensing.
 
 ## Status
 
-This is v0.1 — an early interactive teaching atlas. The app now includes the
-core viewer shell, procedural watch parts, movement switching, exploded view,
-teardown mode, energy-flow mode, isolate mode, searchable educational part
-copy, and clickable part explanations.
+This is v0.2 — an interactive teaching atlas with a full visual overhaul. The
+watch now renders as a believable timepiece: image-based studio lighting gives
+the steel, brass, and glass real reflections; a physically transmissive crystal
+sits over a nested case; and the camera frames each view mode automatically.
 
-The geometry is intentionally simplified. Visual fidelity and content depth
-will grow in future iterations. See `docs/PRODUCT_SPEC.md` for the full product
-vision and `docs/RESEARCH_AND_ASSET_PLAN.md` for the long-term asset plan.
+The geometry is still procedural (see `docs/PRODUCT_SPEC.md`), but proportions,
+materials, lighting, and framing have all been reworked so the app reads like a
+watchmaker's bench rather than a stack of discs.
 
 ## Current features
 
 - Manual, automatic, quartz, and exterior watch modes
 - Procedural 3D watch parts rendered with React Three Fiber
-- Assembled and exploded views
-- Guided teardown steps
-- Energy-flow / assembly-map overlay
-- Clickable part labels and educational info panels
+- Studio image-based lighting with real metal/glass reflections and contact
+  shadows (no external HDR assets — works fully offline and on GitHub Pages)
+- A properly nested case with a physically transmissive glass crystal
+- Assembled, exploded, teardown, energy-flow, and isolate views
+- A mode-aware camera that eases to the best framing and angle for each view,
+  with gentle idle auto-rotation on the assembled watch
+- Emissive selection/hover highlighting on parts
+- Guided teardown steps and an ordered energy-flow / assembly map
+- Clickable part labels, a first-run interaction hint, and rich educational
+  info panels
 - Part search
 
 ## Getting started
