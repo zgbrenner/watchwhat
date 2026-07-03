@@ -1,6 +1,6 @@
 import type { MovementConfig, MovementType, PartTransform, Vector3Tuple } from "@/types/watch"
 import { explodePosition } from "@/utils/geometry"
-import { watchParts } from "./watchParts"
+import { partCatalog } from "./partCatalog"
 
 type LayoutEntry = {
   position: Vector3Tuple
@@ -18,7 +18,12 @@ type LayoutEntry = {
  */
 const PART_LAYOUT: Record<string, LayoutEntry> = {
   "case-back": { position: [0, 0, -0.55] },
-  "rotor-automatic": { position: [0, 0, -0.42] },
+  "rotor-automatic": { position: [0, 0, -0.42], rotation: [0, 0, 0], scale: 1.05 },
+  "rotor-bearing": { position: [0, 0, -0.395], scale: 0.75 },
+  "automatic-bridge": { position: [0, 0, -0.36], scale: [1, 0.72, 1] },
+  "reverser-wheel": { position: [-0.16, -0.18, -0.34], scale: 0.82 },
+  "winding-wheel": { position: [0.03, -0.2, -0.335], scale: 0.72 },
+  "reduction-wheel": { position: [0.18, -0.15, -0.33], scale: 0.65 },
   "bridge-train": { position: [0, 0, -0.3] },
   "wheel-balance": { position: [0.32, 0.2, -0.28] },
   "spring-hairspring": { position: [0.32, 0.2, -0.26] },
@@ -73,7 +78,7 @@ function buildConfig(
   tagline: string,
   description: string,
 ): MovementConfig {
-  const parts = watchParts.filter((part) => part.movementTypes.includes(id))
+  const parts = partCatalog.filter((part) => part.movementTypes.includes(id))
   const partIds = parts.map((part) => part.id)
   return {
     id,
