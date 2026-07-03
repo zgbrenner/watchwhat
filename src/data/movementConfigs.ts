@@ -1,60 +1,220 @@
 import type { MovementConfig, MovementType, PartTransform, Vector3Tuple } from "@/types/watch"
-import { explodePosition } from "@/utils/geometry"
 import { partCatalog } from "./partCatalog"
 
 type LayoutEntry = {
   position: Vector3Tuple
+  explodedPosition?: Vector3Tuple
   rotation?: Vector3Tuple
+  explodedRotation?: Vector3Tuple
   scale?: Vector3Tuple | number
 }
 
 /**
- * Assembled-position lookup for every part ID. Positions are expressed in
- * a small, unitless watch-diameter scale (roughly -1 to 1 on each axis)
- * with z as the case-thickness axis (negative = case-back side, positive =
- * crystal side). These are placeholder coordinates for procedural
- * geometry — real GLB assets can override them per part without touching
- * any component code, since everything reads from this single table.
+ * Unitless, face-on watch layout. x/y are the watch face plane and z is the
+ * thickness axis. The first pass accidentally treated many round primitives
+ * as if their height axis were z while Three.js cylinders default to y; the
+ * primitives now match this table.
  */
 const PART_LAYOUT: Record<string, LayoutEntry> = {
-  "case-back": { position: [0, 0, -0.55] },
-  "rotor-automatic": { position: [0, 0, -0.42], rotation: [0, 0, 0], scale: 1.05 },
-  "rotor-bearing": { position: [0, 0, -0.395], scale: 0.75 },
-  "automatic-bridge": { position: [0, 0, -0.36], scale: [1, 0.72, 1] },
-  "reverser-wheel": { position: [-0.16, -0.18, -0.34], scale: 0.82 },
-  "winding-wheel": { position: [0.03, -0.2, -0.335], scale: 0.72 },
-  "reduction-wheel": { position: [0.18, -0.15, -0.33], scale: 0.65 },
-  "bridge-train": { position: [0, 0, -0.3] },
-  "wheel-balance": { position: [0.32, 0.2, -0.28] },
-  "spring-hairspring": { position: [0.32, 0.2, -0.26] },
-  "pallet-fork": { position: [0.16, 0.14, -0.27] },
-  "wheel-escape": { position: [0.05, 0.1, -0.27] },
-  "wheel-fourth": { position: [0, 0, -0.25] },
-  "wheel-third": { position: [-0.06, 0, -0.22] },
-  "wheel-center": { position: [-0.1, 0, -0.19] },
-  mainplate: { position: [0, 0, -0.15] },
-  "barrel-mainspring": { position: [-0.26, 0.16, -0.15] },
-  mainspring: { position: [-0.26, 0.16, -0.15], scale: 0.9 },
-  "crown-wheel": { position: [0.3, -0.2, -0.1] },
-  "ratchet-wheel": { position: [0.3, -0.15, -0.1] },
-  "keyless-works": { position: [0.36, -0.1, -0.05] },
-  "jewel-bearing": { position: [0.02, -0.05, -0.15] },
-  "screw-movement": { position: [0.2, 0.2, -0.05] },
-  "dial-face": { position: [0, 0, 0.05] },
-  "hand-hour": { position: [0, 0, 0.1] },
-  "hand-minute": { position: [0, 0, 0.12] },
-  "hand-second": { position: [0, 0, 0.14] },
-  "case-crystal": { position: [0, 0, 0.2] },
-  "case-bezel": { position: [0, 0, 0.22] },
-  "case-middle": { position: [0, 0, 0] },
-  "crown-stem": { position: [0.6, 0, -0.05] },
-  "strap-lug": { position: [0, 0, -0.05] },
-  "battery-cell": { position: [-0.3, -0.2, -0.15] },
-  "clip-battery": { position: [-0.3, -0.15, -0.15] },
-  "circuit-ic": { position: [0, -0.25, -0.1] },
-  "crystal-quartz": { position: [0.25, -0.25, -0.1] },
-  "coil-stepper": { position: [0.15, 0.15, -0.1] },
-  "stepper-motor": { position: [0.1, 0.1, -0.08] },
+  "case-back": {
+    position: [0, 0, -0.34],
+    explodedPosition: [0, 0, -1.0],
+    scale: 1.08,
+  },
+  "rotor-automatic": {
+    position: [0, 0, -0.28],
+    explodedPosition: [0, 0, -0.82],
+    rotation: [0, 0, -0.35],
+    explodedRotation: [0, 0, -1.1],
+    scale: 1.08,
+  },
+  "rotor-bearing": {
+    position: [0, 0, -0.255],
+    explodedPosition: [0.2, -0.12, -0.74],
+    scale: 0.85,
+  },
+  "automatic-bridge": {
+    position: [0, -0.05, -0.235],
+    explodedPosition: [-0.22, -0.18, -0.68],
+    scale: [1.05, 0.64, 1],
+  },
+  "reverser-wheel": {
+    position: [-0.2, -0.17, -0.215],
+    explodedPosition: [-0.48, -0.38, -0.58],
+    scale: 0.95,
+  },
+  "winding-wheel": {
+    position: [-0.02, -0.2, -0.21],
+    explodedPosition: [-0.04, -0.5, -0.55],
+    scale: 0.85,
+  },
+  "reduction-wheel": {
+    position: [0.15, -0.16, -0.205],
+    explodedPosition: [0.38, -0.42, -0.52],
+    scale: 0.78,
+  },
+
+  "case-middle": {
+    position: [0, 0, -0.05],
+    explodedPosition: [0, 0, -0.08],
+    scale: 1.06,
+  },
+  "strap-lug": {
+    position: [0, 0, -0.08],
+    explodedPosition: [0, 0, -0.18],
+    scale: 1.05,
+  },
+  "case-bezel": {
+    position: [0, 0, 0.22],
+    explodedPosition: [0, 0, 0.74],
+    scale: 1.04,
+  },
+  "case-crystal": {
+    position: [0, 0, 0.25],
+    explodedPosition: [0, 0, 0.9],
+    scale: 1.02,
+  },
+  "dial-face": {
+    position: [0, 0, 0.12],
+    explodedPosition: [0, 0, 0.58],
+  },
+  "hand-hour": {
+    position: [0, 0, 0.155],
+    explodedPosition: [-0.12, 0.1, 0.84],
+    rotation: [0, 0, -0.72],
+    explodedRotation: [0, 0, -0.72],
+  },
+  "hand-minute": {
+    position: [0, 0, 0.17],
+    explodedPosition: [0.08, 0.18, 0.9],
+    rotation: [0, 0, 0.52],
+    explodedRotation: [0, 0, 0.52],
+  },
+  "hand-second": {
+    position: [0, 0, 0.185],
+    explodedPosition: [0.16, -0.05, 0.96],
+    rotation: [0, 0, 1.9],
+    explodedRotation: [0, 0, 1.9],
+  },
+  "crown-stem": {
+    position: [0.55, 0, 0.02],
+    explodedPosition: [0.86, 0, 0.12],
+    rotation: [0, 0, 0],
+  },
+
+  mainplate: {
+    position: [0, 0, -0.08],
+    explodedPosition: [0, 0, -0.36],
+    scale: 1.05,
+  },
+  "barrel-mainspring": {
+    position: [-0.23, 0.18, -0.035],
+    explodedPosition: [-0.62, 0.44, -0.1],
+    scale: 1.15,
+  },
+  mainspring: {
+    position: [-0.23, 0.18, -0.012],
+    explodedPosition: [-0.72, 0.52, 0.04],
+    scale: 1.02,
+  },
+  "crown-wheel": {
+    position: [0.3, -0.06, -0.035],
+    explodedPosition: [0.64, -0.2, -0.1],
+    scale: 0.82,
+  },
+  "ratchet-wheel": {
+    position: [0.18, -0.12, -0.03],
+    explodedPosition: [0.42, -0.38, -0.06],
+    scale: 0.92,
+  },
+  "keyless-works": {
+    position: [0.36, 0.02, -0.01],
+    explodedPosition: [0.78, 0.12, 0.02],
+    scale: 0.95,
+  },
+  "wheel-center": {
+    position: [0, 0, -0.02],
+    explodedPosition: [0, -0.52, 0.0],
+    scale: 1.05,
+  },
+  "wheel-third": {
+    position: [0.13, -0.06, -0.015],
+    explodedPosition: [0.42, -0.34, 0.04],
+    scale: 0.92,
+  },
+  "wheel-fourth": {
+    position: [0.05, -0.2, -0.01],
+    explodedPosition: [0.1, -0.62, 0.08],
+    scale: 0.86,
+  },
+  "wheel-escape": {
+    position: [0.2, -0.25, 0.0],
+    explodedPosition: [0.48, -0.64, 0.14],
+    scale: 0.78,
+  },
+  "pallet-fork": {
+    position: [0.3, -0.18, 0.015],
+    explodedPosition: [0.72, -0.48, 0.22],
+    rotation: [0, 0, 0.25],
+    scale: 0.95,
+  },
+  "wheel-balance": {
+    position: [0.28, 0.19, 0.012],
+    explodedPosition: [0.68, 0.48, 0.18],
+    scale: 1.12,
+  },
+  "spring-hairspring": {
+    position: [0.28, 0.19, 0.032],
+    explodedPosition: [0.76, 0.54, 0.28],
+    scale: 1.02,
+  },
+  "bridge-train": {
+    position: [0.03, -0.08, 0.035],
+    explodedPosition: [0.0, -0.48, 0.34],
+    rotation: [0, 0, -0.18],
+    scale: [1.12, 0.62, 1],
+  },
+  "jewel-bearing": {
+    position: [0.12, -0.08, 0.06],
+    explodedPosition: [0.34, -0.22, 0.42],
+    scale: 0.9,
+  },
+  "screw-movement": {
+    position: [-0.12, -0.24, 0.065],
+    explodedPosition: [-0.34, -0.56, 0.42],
+    scale: 1.0,
+  },
+
+  "battery-cell": {
+    position: [-0.24, -0.16, -0.01],
+    explodedPosition: [-0.62, -0.38, 0.14],
+    scale: 1.18,
+  },
+  "clip-battery": {
+    position: [-0.24, -0.06, 0.02],
+    explodedPosition: [-0.58, -0.12, 0.3],
+    scale: [1.1, 0.58, 1],
+  },
+  "circuit-ic": {
+    position: [0.04, -0.2, 0.0],
+    explodedPosition: [0.08, -0.58, 0.18],
+    scale: [1.28, 0.8, 1],
+  },
+  "crystal-quartz": {
+    position: [0.24, -0.08, 0.015],
+    explodedPosition: [0.58, -0.2, 0.3],
+    scale: 1.1,
+  },
+  "coil-stepper": {
+    position: [0.18, 0.16, 0.015],
+    explodedPosition: [0.48, 0.42, 0.28],
+    scale: 1.2,
+  },
+  "stepper-motor": {
+    position: [0.05, 0.16, 0.02],
+    explodedPosition: [0.1, 0.48, 0.34],
+    scale: 0.95,
+  },
 }
 
 function buildTransform(partId: string): PartTransform {
@@ -65,9 +225,9 @@ function buildTransform(partId: string): PartTransform {
   return {
     partId,
     assembledPosition: layout.position,
-    explodedPosition: explodePosition(layout.position),
+    explodedPosition: layout.explodedPosition ?? layout.position,
     assembledRotation: layout.rotation,
-    explodedRotation: layout.rotation,
+    explodedRotation: layout.explodedRotation ?? layout.rotation,
     scale: layout.scale,
   }
 }
