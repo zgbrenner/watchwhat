@@ -13,7 +13,7 @@ export const automaticParts: WatchPart[] = [
     connectsTo: ["rotor-automatic", "automatic-bridge"],
     failureMode: "A worn rotor bearing can make the rotor wobble, scrape the case back, or wind inefficiently.",
     disassemblyStep: 15.5,
-    energyFlowOrder: 1,
+    energyFlowOrder: 0.2,
     quizPrompt: "What part lets the automatic rotor spin around the center of the movement?",
   },
   {
@@ -41,7 +41,7 @@ export const automaticParts: WatchPart[] = [
     connectsTo: ["rotor-automatic", "winding-wheel", "automatic-bridge"],
     failureMode: "Worn reverser wheels can cause weak automatic winding even if the watch still runs when wound by hand.",
     disassemblyStep: 17,
-    energyFlowOrder: 2,
+    energyFlowOrder: 0.4,
     quizPrompt: "Which automatic part helps convert rotor motion into winding torque?",
   },
   {
@@ -55,7 +55,7 @@ export const automaticParts: WatchPart[] = [
       "The wheel meshes with the reverser system and downstream winding components, reducing and redirecting rotor motion until it can tighten the mainspring.",
     connectsTo: ["reverser-wheel", "ratchet-wheel", "barrel-mainspring"],
     disassemblyStep: 18,
-    energyFlowOrder: 3,
+    energyFlowOrder: 0.6,
   },
   {
     id: "reduction-wheel",
@@ -68,6 +68,6 @@ export const automaticParts: WatchPart[] = [
       "By changing gear size and mesh direction inside the automatic module, the reduction wheel makes rotor movement better suited to turning the barrel and ratchet system.",
     connectsTo: ["winding-wheel", "barrel-mainspring"],
     disassemblyStep: 18.5,
-    energyFlowOrder: 4,
+    energyFlowOrder: 0.8,
   },
 ]
