@@ -1,7 +1,6 @@
 import { AlertTriangle, HelpCircle, Link2, Route } from "lucide-react"
-import { getPartById } from "@/data/watchParts"
 import { useViewerStore } from "@/store/viewerStore"
-import { getConnectedParts } from "@/utils/partLookup"
+import { getConnectedParts, getPartById } from "@/utils/partLookup"
 
 export function PartInfoPanel() {
   const selectedPartId = useViewerStore((state) => state.selectedPartId)
@@ -39,7 +38,7 @@ export function PartInfoPanel() {
         <div className="rounded-lg border border-bench-700 bg-bench-900 p-2">
           <span className="block text-[10px] uppercase tracking-wide text-bench-500">Flow</span>
           <span className="text-bench-100">
-            {part.energyFlowOrder === undefined ? "Not in path" : `Order ${part.energyFlowOrder + 1}`}
+            {part.energyFlowOrder === undefined ? "Not in path" : "Included"}
           </span>
         </div>
       </div>

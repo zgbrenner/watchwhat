@@ -8,6 +8,7 @@ import { Gear } from "@/components/watch/primitives/Gear"
 import { Hand } from "@/components/watch/primitives/Hand"
 import { Jewel } from "@/components/watch/primitives/Jewel"
 import { Plate } from "@/components/watch/primitives/Plate"
+import { Rotor } from "@/components/watch/primitives/Rotor"
 import { Screw } from "@/components/watch/primitives/Screw"
 import { Spring } from "@/components/watch/primitives/Spring"
 import { Strap } from "@/components/watch/primitives/Strap"
@@ -26,6 +27,12 @@ const PART_ID_OVERRIDES: Record<string, (part: WatchPart) => ReactNode> = {
   "dial-face": () => <Plate radius={0.38} thickness={0.01} color="#f3e9cf" />,
   mainplate: () => <Plate radius={0.4} thickness={0.02} color="#e6d1a1" />,
   "bridge-train": () => <Plate radius={0.22} thickness={0.015} color="#d6b46b" />,
+  "rotor-automatic": () => <Rotor />,
+  "rotor-bearing": () => <Jewel radius={0.028} color="#d7dce0" />,
+  "automatic-bridge": () => <Plate radius={0.3} thickness={0.012} color="#c9a85d" />,
+  "reverser-wheel": () => <Gear radius={0.055} thickness={0.018} teeth={16} color="#d6b46b" />,
+  "winding-wheel": () => <Gear radius={0.045} thickness={0.016} teeth={14} color="#c99b49" />,
+  "reduction-wheel": () => <Gear radius={0.04} thickness={0.014} teeth={12} color="#b8843a" />,
   "jewel-bearing": () => <Jewel />,
   "screw-movement": () => <Screw />,
   "strap-lug": () => <Strap />,

@@ -1,5 +1,5 @@
 import { movementConfigs } from "@/data/movementConfigs"
-import { getPartById, watchParts } from "@/data/watchParts"
+import { getCatalogPartById, partCatalog } from "@/data/partCatalog"
 import type { MovementType, PartTransform, WatchPart } from "@/types/watch"
 
 /**
@@ -8,7 +8,7 @@ import type { MovementType, PartTransform, WatchPart } from "@/types/watch"
  */
 export function listPartsForMovement(movementType: MovementType): WatchPart[] {
   return movementConfigs[movementType].partIds
-    .map((id) => getPartById(id))
+    .map((id) => getCatalogPartById(id))
     .filter((part): part is WatchPart => part !== undefined)
 }
 
@@ -28,10 +28,10 @@ export function getTransformForPart(
  * records (skipping any dangling IDs).
  */
 export function getConnectedParts(partId: string): WatchPart[] {
-  const part = getPartById(partId)
+  const part = getCatalogPartById(partId)
   if (!part) return []
   return part.connectsTo
-    .map((id) => getPartById(id))
+    .map((id) => getCatalogPartById(id))
     .filter((connected): connected is WatchPart => connected !== undefined)
 }
 
@@ -41,7 +41,7 @@ export function getConnectedParts(partId: string): WatchPart[] {
  */
 export function searchParts(query: string, movementType?: MovementType): WatchPart[] {
   const normalized = query.trim().toLowerCase()
-  const scope = movementType ? listPartsForMovement(movementType) : watchParts
+  const scope = movementType ? listPartsForMovement(movementType) : partCatalog
   if (!normalized) return scope
   return scope.filter(
     (part) =>
@@ -50,3 +50,5 @@ export function searchParts(query: string, movementType?: MovementType): WatchPa
       part.id.toLowerCase().includes(normalized),
   )
 }
+
+export { getCatalogPartById as getPartById }
