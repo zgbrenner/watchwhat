@@ -1,4 +1,4 @@
-import { Box, Focus, HelpCircle, Layers, Wrench, Zap } from "lucide-react"
+import { Box, Focus, Layers, Wrench, Zap } from "lucide-react"
 import { useViewerStore } from "@/store/viewerStore"
 import type { ViewerMode } from "@/types/watch"
 
@@ -8,7 +8,6 @@ const MODE_ICONS: Record<ViewerMode, typeof Box> = {
   teardown: Wrench,
   energy: Zap,
   isolate: Focus,
-  quiz: HelpCircle,
 }
 
 const MODE_LABELS: Record<ViewerMode, string> = {
@@ -17,10 +16,9 @@ const MODE_LABELS: Record<ViewerMode, string> = {
   teardown: "Teardown",
   energy: "Energy Flow",
   isolate: "Isolate",
-  quiz: "Quiz",
 }
 
-const MODE_ORDER: ViewerMode[] = ["assembled", "exploded", "teardown", "energy", "isolate", "quiz"]
+const MODE_ORDER: ViewerMode[] = ["assembled", "exploded", "teardown", "energy", "isolate"]
 
 export function ModeSwitcher() {
   const viewerMode = useViewerStore((state) => state.viewerMode)
