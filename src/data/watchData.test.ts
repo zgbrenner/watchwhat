@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest"
 import { movementConfigs } from "@/data/movementConfigs"
+import { getCatalogPartById, partCatalog } from "@/data/partCatalog"
 import { teardownSteps } from "@/data/teardownSteps"
-import { getPartById, watchParts } from "@/data/watchParts"
 import type { MovementType } from "@/types/watch"
 
 const movementTypes: MovementType[] = ["manual", "automatic", "quartz", "exterior"]
 
 describe("catalog integrity", () => {
   it("has educational copy for every catalog item", () => {
-    for (const part of watchParts) {
+    for (const part of partCatalog) {
       expect(part.label.length).toBeGreaterThan(0)
       expect(part.shortDefinition.length).toBeGreaterThan(0)
       expect(part.function.length).toBeGreaterThan(0)
@@ -31,7 +31,7 @@ describe("catalog integrity", () => {
   it("uses valid catalog IDs in teardown steps", () => {
     for (const movementType of movementTypes) {
       for (const step of teardownSteps[movementType]) {
-        expect(getPartById(step.partId)).toBeDefined()
+        expect(getCatalogPartById(step.partId)).toBeDefined()
         expect(step.movementTypes).toContain(movementType)
       }
     }
@@ -50,10 +50,21 @@ describe("catalog integrity", () => {
   it("does not duplicate flow order values within a movement", () => {
     for (const movementType of movementTypes) {
       const flowOrders = movementConfigs[movementType].partIds
-        .map((partId) => getPartById(partId)?.energyFlowOrder)
+        .map((partId) => getCatalogPartById(partId)?.energyFlowOrder)
         .filter((flowOrder): flowOrder is number => flowOrder !== undefined)
 
       expect(new Set(flowOrders).size).toBe(flowOrders.length)
     }
+  })
+
+  it("adds a real automatic winding module on top of the manual movement", () => {
+    const automaticPartIds = new Set(movementConfigs.automatic.partIds)
+
+    expect(automaticPartIds.has("rotor-automatic")).toBe(true)
+    expect(automaticPartIds.has("rotor-bearing")).toBe(true)
+    expect(automaticPartIds.has("automatic-bridge")).toBe(true)
+    expect(automaticPartIds.has("reverser-wheel")).toBe(true)
+    expect(automaticPartIds.has("winding-wheel")).toBe(true)
+    expect(automaticPartIds.has("reduction-wheel")).toBe(true)
   })
 })
