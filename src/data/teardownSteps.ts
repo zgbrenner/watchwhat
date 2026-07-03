@@ -1,5 +1,5 @@
 import type { MovementType, TeardownStep } from "@/types/watch"
-import { watchParts } from "./watchParts"
+import { partCatalog } from "./partCatalog"
 
 const STEP_INSTRUCTIONS: Record<string, string> = {
   "case-back": "Unscrew or pry off the case back to expose the movement.",
@@ -28,6 +28,11 @@ const STEP_INSTRUCTIONS: Record<string, string> = {
   "barrel-mainspring": "Lift out the mainspring barrel.",
   mainspring: "Carefully release the mainspring from the barrel.",
   "rotor-automatic": "Unscrew the oscillating weight from the automatic module.",
+  "rotor-bearing": "Remove the rotor bearing after the rotor clears the bridge.",
+  "automatic-bridge": "Lift the automatic winding bridge to expose the self-winding train.",
+  "reverser-wheel": "Remove the reverser wheel from the automatic winding bridge.",
+  "winding-wheel": "Lift the automatic winding wheel from the module.",
+  "reduction-wheel": "Remove the reduction wheel that steps rotor motion down into winding torque.",
   "bridge-train": "Unscrew the train wheel bridge to free the gear train.",
   "wheel-escape": "Lift the escape wheel from its jewel.",
   "pallet-fork": "Remove the pallet fork from the pallet bridge.",
@@ -38,7 +43,7 @@ const STEP_INSTRUCTIONS: Record<string, string> = {
 }
 
 function buildStepsForMovement(movementType: MovementType): TeardownStep[] {
-  return watchParts
+  return partCatalog
     .filter((part) => part.movementTypes.includes(movementType))
     .slice()
     .sort((a, b) => a.disassemblyStep - b.disassemblyStep)
