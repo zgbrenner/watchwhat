@@ -12,7 +12,7 @@ beforeEach(() => {
 describe("PartInfoPanel", () => {
   it("shows a placeholder prompt when no part is selected", () => {
     render(<PartInfoPanel />)
-    expect(screen.getByText(/select a part in the viewer/i)).toBeInTheDocument()
+    expect(screen.getByText(/click a part of the watch/i)).toBeInTheDocument()
   })
 
   it("shows educational content for the selected part", () => {
