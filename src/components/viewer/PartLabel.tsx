@@ -7,12 +7,12 @@ type PartLabelProps = {
 
 export function PartLabel({ label, highlighted = false }: PartLabelProps) {
   return (
-    <Html center distanceFactor={2.2} zIndexRange={[10, 0]}>
+    <Html center distanceFactor={2.4} zIndexRange={[10, 0]}>
       <span
-        className={`pointer-events-none whitespace-nowrap rounded-full border px-2 py-0.5 text-[10px] font-medium shadow-sm ${
+        className={`pointer-events-none whitespace-nowrap rounded-full border px-2.5 py-0.5 text-[10px] font-semibold shadow-lg backdrop-blur-sm ${
           highlighted
-            ? "border-brass-400 bg-brass-400/90 text-bench-950"
-            : "border-bench-700 bg-bench-900/90 text-bench-100"
+            ? "border-brass-300 bg-brass-400 text-bench-950"
+            : "border-bench-700 bg-bench-900/85 text-bench-50"
         }`}
       >
         {label}

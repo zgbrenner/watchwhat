@@ -9,11 +9,11 @@ type AppShellProps = {
 
 export function AppShell({ children }: AppShellProps) {
   return (
-    <div className="flex h-screen flex-col bg-bench-950 text-bench-50">
+    <div className="flex h-screen flex-col text-bench-50">
       <TopBar />
       <div className="flex flex-1 flex-col overflow-hidden md:flex-row">
         <LeftPanel />
-        <main className="relative flex-1 overflow-hidden bg-bench-950">{children}</main>
+        <main className="relative flex-1 overflow-hidden">{children}</main>
         <RightPanel />
       </div>
     </div>

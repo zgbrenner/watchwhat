@@ -25,31 +25,32 @@ export function ModeSwitcher() {
   const setViewerMode = useViewerStore((state) => state.setViewerMode)
 
   return (
-    <div className="flex flex-col gap-2">
-      <h2 className="text-xs font-semibold uppercase tracking-wide text-bench-300">View Mode</h2>
-      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Viewer mode">
-        {MODE_ORDER.map((mode) => {
-          const Icon = MODE_ICONS[mode]
-          const isActive = viewerMode === mode
-          return (
-            <button
-              key={mode}
-              type="button"
-              role="radio"
-              aria-checked={isActive}
-              onClick={() => setViewerMode(mode)}
-              className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                isActive
-                  ? "border-brass-400 bg-brass-400/10 text-brass-200"
-                  : "border-bench-700 bg-bench-900 text-bench-200 hover:border-bench-500"
-              }`}
-            >
-              <Icon size={14} aria-hidden="true" />
-              {MODE_LABELS[mode]}
-            </button>
-          )
-        })}
-      </div>
+    <div
+      className="flex items-center gap-1 rounded-full border border-bench-800 bg-bench-900/70 p-1 shadow-lg shadow-black/20"
+      role="radiogroup"
+      aria-label="Viewer mode"
+    >
+      {MODE_ORDER.map((mode) => {
+        const Icon = MODE_ICONS[mode]
+        const isActive = viewerMode === mode
+        return (
+          <button
+            key={mode}
+            type="button"
+            role="radio"
+            aria-checked={isActive}
+            onClick={() => setViewerMode(mode)}
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
+              isActive
+                ? "bg-brass-400/15 text-brass-200 shadow-sm ring-1 ring-brass-400/40"
+                : "text-bench-300 hover:bg-bench-800/70 hover:text-bench-100"
+            }`}
+          >
+            <Icon size={14} aria-hidden="true" />
+            <span className="hidden sm:inline">{MODE_LABELS[mode]}</span>
+          </button>
+        )
+      })}
     </div>
   )
 }

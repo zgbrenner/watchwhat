@@ -1,9 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react"
 import { useFrame, type ThreeEvent } from "@react-three/fiber"
-import type { Group, Material, Mesh } from "three"
+import { Color, type Group, type Material, type Mesh } from "three"
 import { Case } from "@/components/watch/primitives/Case"
 import { Coil } from "@/components/watch/primitives/Coil"
 import { Crown } from "@/components/watch/primitives/Crown"
+import { Crystal } from "@/components/watch/primitives/Crystal"
 import { Gear } from "@/components/watch/primitives/Gear"
 import { Hand } from "@/components/watch/primitives/Hand"
 import { Jewel } from "@/components/watch/primitives/Jewel"
@@ -22,22 +23,34 @@ import { PartLabel } from "./PartLabel"
 function DialPrimitive() {
   return (
     <group>
-      <Plate radius={0.38} thickness={0.012} color="#f4ead2" />
+      {/* Slightly domed, softly metallic dial face. */}
+      <Plate radius={0.38} thickness={0.012} color="#eef1f4" metalness={0.35} roughness={0.5} />
+      {/* Recessed minute track ring. */}
+      <mesh position={[0, 0, 0.0125]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.345, 0.004, 12, 96]} />
+        <meshStandardMaterial color="#b9c0c8" metalness={0.6} roughness={0.3} />
+      </mesh>
+      {/* Applied hour + minute markers. */}
       {Array.from({ length: 60 }, (_, index) => {
         const angle = (index / 60) * Math.PI * 2
         const isHour = index % 5 === 0
-        const x = Math.sin(angle) * (isHour ? 0.31 : 0.335)
-        const y = Math.cos(angle) * (isHour ? 0.31 : 0.335)
+        const x = Math.sin(angle) * (isHour ? 0.305 : 0.335)
+        const y = Math.cos(angle) * (isHour ? 0.305 : 0.335)
         return (
-          <mesh key={index} position={[x, y, 0.012]} rotation={[0, 0, -angle]}>
-            <boxGeometry args={[isHour ? 0.012 : 0.004, isHour ? 0.056 : 0.022, 0.004]} />
-            <meshStandardMaterial color="#20242a" metalness={0.28} roughness={0.38} />
+          <mesh key={index} position={[x, y, 0.016]} rotation={[0, 0, -angle]} castShadow>
+            <boxGeometry args={[isHour ? 0.014 : 0.004, isHour ? 0.05 : 0.02, 0.006]} />
+            <meshStandardMaterial
+              color={isHour ? "#1a1d22" : "#3a4048"}
+              metalness={0.7}
+              roughness={0.28}
+            />
           </mesh>
         )
       })}
-      <mesh position={[0, 0, 0.015]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.02, 0.02, 0.006, 32]} />
-        <meshStandardMaterial color="#20242a" metalness={0.45} roughness={0.32} />
+      {/* Polished central pinion boss. */}
+      <mesh position={[0, 0, 0.016]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.018, 0.018, 0.008, 32]} />
+        <meshStandardMaterial color="#c9a34d" metalness={0.9} roughness={0.22} />
       </mesh>
     </group>
   )
@@ -209,10 +222,10 @@ function CircuitPrimitive() {
 }
 
 const PART_ID_OVERRIDES: Record<string, (part: WatchPart) => ReactNode> = {
-  "case-back": () => <Case radius={0.45} height={0.035} color="#707c87" />,
-  "case-middle": () => <Case radius={0.45} height={0.14} color="#9ba5ad" openEnded />,
-  "case-crystal": () => <Case radius={0.4} height={0.012} color="#d6e4ea" opacity={0.32} />,
-  "case-bezel": () => <Case radius={0.46} height={0.025} color="#c4cad0" openEnded />,
+  "case-back": () => <Case radius={0.45} height={0.05} color="#8b959e" />,
+  "case-middle": () => <Case radius={0.45} height={0.11} color="#b3bcc4" openEnded />,
+  "case-crystal": () => <Crystal radius={0.4} thickness={0.014} />,
+  "case-bezel": () => <Case radius={0.47} height={0.03} color="#c6ced5" openEnded />,
   "dial-face": () => <DialPrimitive />,
   mainplate: () => <MainPlatePrimitive />,
   "bridge-train": () => <BridgePrimitive />,
@@ -289,11 +302,20 @@ type PartMeshProps = {
   transform: PartTransform
 }
 
+type EmissiveMaterial = Material & {
+  emissive?: Color
+  emissiveIntensity?: number
+}
+
 type StoredMaterialState = {
   watchwhatOriginalOpacity?: number
   watchwhatOriginalTransparent?: boolean
   watchwhatOriginalDepthWrite?: boolean
+  watchwhatOriginalEmissive?: number
+  watchwhatOriginalEmissiveIntensity?: number
 }
+
+const HIGHLIGHT_COLOR = new Color("#cfa049")
 
 const EXPLODE_DURATION_SECONDS = 0.5
 const ZERO_ROTATION: Vector3Tuple = [0, 0, 0]
@@ -329,6 +351,31 @@ function applyGroupOpacity(group: Group, opacityMultiplier: number) {
   })
 }
 
+function applyEmissive(material: EmissiveMaterial, intensity: number) {
+  if (!material.emissive) return
+  const userData = material.userData as StoredMaterialState
+  userData.watchwhatOriginalEmissive ??= material.emissive.getHex()
+  userData.watchwhatOriginalEmissiveIntensity ??= material.emissiveIntensity ?? 1
+
+  if (intensity > 0) {
+    material.emissive.copy(HIGHLIGHT_COLOR)
+    material.emissiveIntensity = intensity
+  } else {
+    material.emissive.setHex(userData.watchwhatOriginalEmissive)
+    material.emissiveIntensity = userData.watchwhatOriginalEmissiveIntensity
+  }
+  material.needsUpdate = true
+}
+
+function applyGroupEmissive(group: Group, intensity: number) {
+  group.traverse((child) => {
+    const mesh = child as Mesh
+    if (!mesh.material) return
+    const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+    materials.forEach((material) => applyEmissive(material as EmissiveMaterial, intensity))
+  })
+}
+
 export function PartMesh({ part, transform }: PartMeshProps) {
   const groupRef = useRef<Group>(null)
 
@@ -357,7 +404,8 @@ export function PartMesh({ part, transform }: PartMeshProps) {
     (viewerMode === "teardown" && part.disassemblyStep <= activeTeardownStepNumber)
 
   const opacityMultiplier = isIsolatedAway ? 0.12 : isFutureTeardownPart ? 0.16 : isDimmedEnergyPart ? 0.18 : 1
-  const emphasis = isSelected ? 1.16 : isHovered ? 1.08 : isCurrentTeardownPart ? 1.12 : 1
+  const emphasis = isSelected ? 1.08 : isHovered ? 1.04 : isCurrentTeardownPart ? 1.06 : 1
+  const highlightIntensity = isSelected ? 0.55 : isCurrentTeardownPart ? 0.45 : isHovered ? 0.28 : 0
   const baseScale = scaleToTuple(transform.scale)
   const visualScale = multiplyScale(baseScale, emphasis)
 
@@ -376,6 +424,11 @@ export function PartMesh({ part, transform }: PartMeshProps) {
     if (!groupRef.current) return
     applyGroupOpacity(groupRef.current, opacityMultiplier)
   }, [opacityMultiplier])
+
+  useEffect(() => {
+    if (!groupRef.current) return
+    applyGroupEmissive(groupRef.current, highlightIntensity)
+  }, [highlightIntensity])
 
   useFrame((_, delta) => {
     const target = shouldExplode ? 1 : 0
