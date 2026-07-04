@@ -17,6 +17,15 @@ describe("useViewerStore", () => {
     expect(state.teardownStep).toBe(0)
     expect(state.showLabels).toBe(true)
     expect(state.isolatedPartId).toBeNull()
+    expect(state.isRunning).toBe(true)
+  })
+
+  it("toggles the running state of the movement", () => {
+    expect(useViewerStore.getState().isRunning).toBe(true)
+    useViewerStore.getState().toggleRunning()
+    expect(useViewerStore.getState().isRunning).toBe(false)
+    useViewerStore.getState().setRunning(true)
+    expect(useViewerStore.getState().isRunning).toBe(true)
   })
 
   it("changes movement type and clears selection state", () => {

@@ -18,6 +18,7 @@ import { useViewerStore } from "@/store/viewerStore"
 import type { PartTransform, Vector3Tuple, WatchPart } from "@/types/watch"
 import { easeInOutCubic } from "@/utils/animation"
 import { lerpVector3 } from "@/utils/geometry"
+import { AnimatedPart } from "./AnimatedPart"
 import { PartLabel } from "./PartLabel"
 
 function DialPrimitive() {
@@ -270,12 +271,14 @@ const PART_ID_OVERRIDES: Record<string, (part: WatchPart) => ReactNode> = {
 }
 
 function DefaultHand({ part }: { part: WatchPart }) {
-  const props: Record<string, { length: number; width: number; angle: number; color?: string }> = {
-    "hand-hour": { length: 0.15, width: 0.02, angle: -0.72 },
-    "hand-minute": { length: 0.24, width: 0.014, angle: 0.52 },
-    "hand-second": { length: 0.28, width: 0.006, angle: 1.9, color: "#b1182d" },
+  // Angle is intentionally left at 0 here — hand orientation is driven live by
+  // AnimatedPart (wall-clock time) so the watch actually tells the time.
+  const props: Record<string, { length: number; width: number; color?: string }> = {
+    "hand-hour": { length: 0.15, width: 0.02 },
+    "hand-minute": { length: 0.24, width: 0.014 },
+    "hand-second": { length: 0.28, width: 0.006, color: "#d12b2b" },
   }
-  const handProps = props[part.id] ?? { length: 0.2, width: 0.012, angle: 0 }
+  const handProps = props[part.id] ?? { length: 0.2, width: 0.012 }
   return <Hand {...handProps} />
 }
 
@@ -479,7 +482,9 @@ export function PartMesh({ part, transform }: PartMeshProps) {
       onPointerOut={handlePointerOut}
       onClick={handleClick}
     >
-      <group scale={visualScale}>{renderPrimitive(part)}</group>
+      <group scale={visualScale}>
+        <AnimatedPart partId={part.id}>{renderPrimitive(part)}</AnimatedPart>
+      </group>
       {showLabels && (isSelected || isHovered || isCurrentTeardownPart) && (
         <PartLabel label={part.label} highlighted={isSelected || isCurrentTeardownPart} />
       )}

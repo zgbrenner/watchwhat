@@ -30,11 +30,17 @@ watchmaker's bench rather than a stack of discs.
 - Assembled, exploded, teardown, energy-flow, and isolate views
 - A mode-aware camera that eases to the best framing and angle for each view,
   with gentle idle auto-rotation on the assembled watch
+- **A watch that actually runs** — the hands show the real current time
+  (mechanical second hands sweep, quartz ticks), the balance wheel oscillates,
+  the gear train turns, and the automatic rotor swings. A play/pause control
+  freezes or resumes the whole movement.
+- Cinematic post-processing (subtle bloom on specular glints + a soft vignette)
 - Emissive selection/hover highlighting on parts
 - Guided teardown steps and an ordered energy-flow / assembly map
 - Clickable part labels, a first-run interaction hint, and rich educational
   info panels
-- Part search
+- Part search and keyboard shortcuts (`1`–`5` modes, `Space` play/pause,
+  `L` labels, `←`/`→` teardown steps, `Esc` deselect)
 
 ## Getting started
 
