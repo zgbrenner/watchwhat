@@ -9,6 +9,7 @@ import { ExteriorModel } from "@/components/watch/ExteriorModel"
 import { useViewerStore } from "@/store/viewerStore"
 import { CameraRig } from "./CameraRig"
 import { EnergyFlowOverlay } from "./EnergyFlowOverlay"
+import { PostFX } from "./PostFX"
 import { SceneLights } from "./SceneLights"
 import { StudioEnvironment } from "./StudioEnvironment"
 import { TeardownControls } from "./TeardownControls"
@@ -63,6 +64,7 @@ export function WatchViewer() {
             far={1.2}
             color="#000000"
           />
+          <PostFX />
         </Suspense>
       </Canvas>
 

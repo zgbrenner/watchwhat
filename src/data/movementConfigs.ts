@@ -89,20 +89,14 @@ const PART_LAYOUT: Record<string, LayoutEntry> = {
   "hand-hour": {
     position: [0, 0, 0.014],
     explodedPosition: [-0.12, 0.1, 0.84],
-    rotation: [0, 0, 0.96],
-    explodedRotation: [0, 0, 0.96],
   },
   "hand-minute": {
     position: [0, 0, 0.022],
     explodedPosition: [0.08, 0.18, 0.9],
-    rotation: [0, 0, -1.05],
-    explodedRotation: [0, 0, -1.05],
   },
   "hand-second": {
     position: [0, 0, 0.03],
     explodedPosition: [0.16, -0.05, 0.96],
-    rotation: [0, 0, 2.5],
-    explodedRotation: [0, 0, 2.5],
   },
   "crown-stem": {
     position: [0.5, 0, -0.02],

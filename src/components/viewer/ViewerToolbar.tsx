@@ -1,9 +1,11 @@
-import { Eye, EyeOff, RotateCcw } from "lucide-react"
+import { Eye, EyeOff, Pause, Play, RotateCcw } from "lucide-react"
 import { useViewerStore } from "@/store/viewerStore"
 
 export function ViewerToolbar() {
   const showLabels = useViewerStore((state) => state.showLabels)
   const setShowLabels = useViewerStore((state) => state.setShowLabels)
+  const isRunning = useViewerStore((state) => state.isRunning)
+  const toggleRunning = useViewerStore((state) => state.toggleRunning)
   const resetViewState = useViewerStore((state) => state.resetViewState)
 
   const buttonClass =
@@ -11,6 +13,16 @@ export function ViewerToolbar() {
 
   return (
     <div className="pointer-events-auto absolute right-4 top-4 flex gap-2">
+      <button
+        type="button"
+        onClick={toggleRunning}
+        className={`${buttonClass} ${isRunning ? "!border-brass-400/50 !text-brass-200" : ""}`}
+        aria-pressed={isRunning}
+        title={isRunning ? "Pause the movement" : "Run the movement"}
+      >
+        {isRunning ? <Pause size={14} aria-hidden="true" /> : <Play size={14} aria-hidden="true" />}
+        {isRunning ? "Running" : "Paused"}
+      </button>
       <button
         type="button"
         onClick={() => setShowLabels(!showLabels)}

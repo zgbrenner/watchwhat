@@ -11,6 +11,7 @@ export type ViewerState = {
   showLabels: boolean
   searchQuery: string
   isolatedPartId: string | null
+  isRunning: boolean
 
   setMovementType: (movementType: MovementType) => void
   setViewerMode: (viewerMode: ViewerMode) => void
@@ -21,6 +22,8 @@ export type ViewerState = {
   setTeardownStep: (stepIndex: number) => void
   setShowLabels: (showLabels: boolean) => void
   setSearchQuery: (searchQuery: string) => void
+  setRunning: (isRunning: boolean) => void
+  toggleRunning: () => void
   resetViewState: () => void
 }
 
@@ -33,6 +36,7 @@ const initialState = {
   showLabels: true,
   searchQuery: "",
   isolatedPartId: null as string | null,
+  isRunning: true,
 }
 
 function lastTeardownStepIndex(movementType: MovementType): number {
@@ -87,6 +91,10 @@ export const useViewerStore = create<ViewerState>((set, get) => ({
   setShowLabels: (showLabels) => set({ showLabels }),
 
   setSearchQuery: (searchQuery) => set({ searchQuery }),
+
+  setRunning: (isRunning) => set({ isRunning }),
+
+  toggleRunning: () => set((state) => ({ isRunning: !state.isRunning })),
 
   resetViewState: () =>
     set({
